@@ -29,7 +29,8 @@ def call_precompile(value: int, rpc_url: str) -> bytes:
 # Example usage
 if __name__ == "__main__":
     test_value = 3 # BTC on testnet is index 3
-    rpc_url = "https://api.hyperliquid-testnet.xyz/evm"
+    rpc_url = "https://rpc.hyperliquid-testnet.xyz/evm"
+    
 
     try:
         result = call_precompile(test_value, rpc_url)
