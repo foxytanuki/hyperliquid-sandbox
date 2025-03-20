@@ -27,19 +27,32 @@ async function callPrecompile(value: number): Promise<string> {
   }
 }
 
+// Convert raw price to floating point
+function convertToFloat(
+  rawPrice: bigint,
+  szDecimals: number,
+  isSpot = false
+): number {
+  // For perp prices: divide by 10^(6 - asset szDecimals)
+  // For spot prices: divide by 10^(8 - base asset szDecimals)
+  const exponent = isSpot ? 8 - szDecimals : 6 - szDecimals;
+  const divisor = 10n ** BigInt(exponent);
+
+  return Number(rawPrice) / Number(divisor);
+}
+
 async function main() {
   const testValue = 3; // BTC on testnet is index 3
+  const szDecimals = 5; // Example value for BTC, adjust as needed
 
   try {
     const result = await callPrecompile(testValue);
-    console.log(`Precompile call successful. Result: ${result}`);
+    const rawPrice = BigInt(result);
+    console.log(`BTC Oracle Price (raw): ${rawPrice}`);
 
-    // To convert to a float divide the returned price by 10^(6 - asset szDecimals)
-    // For spot prices the conversion is 10^(8 - base asset szDecimals) instead
-
-    // If you need to decode the returned value, you can use:
-    // const decodedValue = ethers.AbiCoder.defaultAbiCoder().decode(['uint256'], result);
-    // console.log(`Decoded value: ${decodedValue}`);
+    // Convert to perp price
+    const oraclePrice = convertToFloat(rawPrice, szDecimals, false);
+    console.log(`BTC Oracle Price: ${oraclePrice}`);
   } catch (error) {
     console.error(`Error: ${(error as Error).message}`);
   }
