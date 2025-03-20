@@ -1,4 +1,5 @@
 import { network, ethers } from "hardhat";
+import { getMetadata } from "./utils";
 
 async function callPrecompile(value: number): Promise<string> {
   // Get provider from the hardhat network
@@ -42,11 +43,16 @@ function convertToFloat(
 }
 
 async function main() {
-  const testValue = 3; // BTC on testnet is index 3
-  const szDecimals = 5; // Example value for BTC, adjust as needed
+  const metadata = await getMetadata("BTC");
+
+  if (!metadata) {
+    throw new Error("Failed to get metadata");
+  }
+
+  const { szDecimals, index } = metadata;
 
   try {
-    const result = await callPrecompile(testValue);
+    const result = await callPrecompile(index + 3);
     const rawPrice = BigInt(result);
     console.log(`BTC Oracle Price (raw): ${rawPrice}`);
 
