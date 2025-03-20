@@ -1,5 +1,10 @@
 ## Hyperliquid Sandbox
 
+### Run callPrecompile with hardhat
+
+```
+pnpm hardhat run --no-compile scripts/callPrecompile.ts --network hltestnet
+```
 
 ### Run Python scripts
 
