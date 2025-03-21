@@ -18,7 +18,7 @@ interface MetaResponse {
  * Fetches metadata from Hyperliquid API
  */
 async function fetchMetadata(): Promise<MetaResponse> {
-  const response = await fetch("https://api.hyperliquid.xyz/info", {
+  const response = await fetch("https://api.hyperliquid-testnet.xyz/info", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

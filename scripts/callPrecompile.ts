@@ -52,11 +52,11 @@ async function main() {
   const { szDecimals, index } = metadata;
 
   try {
-    const result = await callPrecompile(index + 3);
+    const result = await callPrecompile(index);
     const rawPrice = BigInt(result);
     console.log(`BTC Oracle Price (raw): ${rawPrice}`);
 
-    // Convert to perp price
+    // Convert to actual price
     const oraclePrice = convertToFloat(rawPrice, szDecimals, false);
     console.log(`BTC Oracle Price: ${oraclePrice}`);
   } catch (error) {
