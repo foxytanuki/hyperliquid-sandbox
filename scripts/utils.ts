@@ -6,8 +6,6 @@ interface Asset {
   name: string;
   szDecimals: number;
   maxLeverage: number;
-  onlyIsolated?: boolean;
-  isDelisted?: boolean;
 }
 
 interface MetaResponse {
@@ -17,8 +15,8 @@ interface MetaResponse {
 /**
  * Fetches metadata from Hyperliquid API
  */
-async function fetchMetadata(): Promise<MetaResponse> {
-  const response = await fetch("https://api.hyperliquid-testnet.xyz/info", {
+async function _fetchMeta(url: string): Promise<MetaResponse> {
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -35,27 +33,34 @@ async function fetchMetadata(): Promise<MetaResponse> {
 
 /**
  * Returns the szDecimals and index for a given asset name
- * @param name Asset name (e.g. "BTC", "ETH")
- * @returns Object containing szDecimals and index, or null if not found
+ * @param names Asset names (e.g. ["BTC", "ETH"])
+ * @returns Array of objects containing szDecimals and index
  */
-export async function getMetadata(
-  name: string
-): Promise<{ szDecimals: number; index: number } | null> {
+export async function getTestnetMetas(
+  names: string[]
+): Promise<{ name: string; szDecimals: number; index: number }[]> {
   try {
-    const metadata = await fetchMetadata();
+    const metadata = await _fetchMeta(
+      "https://api.hyperliquid-testnet.xyz/info"
+    );
 
-    const index = metadata.universe.findIndex((asset) => asset.name === name);
+    const results = names.map((name) => {
+      const index = metadata.universe.findIndex((asset) => asset.name === name);
 
-    if (index === -1) {
-      return null;
-    }
+      if (index === -1) {
+        return null;
+      }
 
-    return {
-      szDecimals: metadata.universe[index].szDecimals,
-      index,
-    };
+      return {
+        name,
+        szDecimals: metadata.universe[index].szDecimals,
+        index,
+      };
+    });
+
+    return results.filter((result) => result !== null);
   } catch (error) {
     console.error("Error getting metadata:", error);
-    return null;
+    return [];
   }
 }
